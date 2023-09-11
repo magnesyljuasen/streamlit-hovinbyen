@@ -37,8 +37,9 @@ def sort_columns_high_to_low(df):
 def rounding_to_int(number):
     return int(round(number, 0))
 
-def plot_dataframe(df):
-    df = sort_columns_high_to_low(df)
+def plot_dataframe(df, sorting = True):
+    if sorting == True:
+        df = sort_columns_high_to_low(df)
     fig = px.line(df, x=df.index, y=df.columns)
     fig["data"][0]["showlegend"] = True
     fig.update_layout(
@@ -93,7 +94,8 @@ def main():
     st.title("Resultater Nedre Glomma")
     df = csv_to_df(folder_path = "data")
     df = select_scenario(df)
-    plot_dataframe(df)
+    plot_dataframe(df, sorting = True)
+    plot_dataframe(df, sorting = False)
     show_metrics(df)
 
 if __name__ == '__main__':
