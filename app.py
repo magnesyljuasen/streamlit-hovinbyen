@@ -95,7 +95,7 @@ def main():
         df = csv_to_df(folder_path = "data")
         df = select_scenario(df)
         plot_dataframe(df, sorting = True)
-        #plot_dataframe(df, sorting = False)
+        plot_dataframe(df, sorting = False)
         show_metrics(df)
 
 if __name__ == '__main__':
