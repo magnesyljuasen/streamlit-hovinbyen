@@ -90,13 +90,13 @@ def main():
 
     with open("app.css") as f:
         st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
-    with st.expander("Se varighetskurve"):
-        st.title("Resultater Nedre Glomma")
-        df = csv_to_df(folder_path = "data")
-        df = select_scenario(df)
-        plot_dataframe(df, sorting = True)
-        plot_dataframe(df, sorting = False)
-        show_metrics(df)
+
+    st.title("Resultater Nedre Glomma")
+    df = csv_to_df(folder_path = "data")
+    df = select_scenario(df)
+    plot_dataframe(df, sorting = True)
+    #plot_dataframe(df, sorting = False)
+    show_metrics(df)
 
 if __name__ == '__main__':
     main()
