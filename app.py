@@ -67,6 +67,7 @@ def rounding_to_int(number):
     return int(round(number, 0))
 
 def plot_dataframe(df, color_sequence, sorting = True):
+    df.sort_index(axis=1, inplace=True)
     if sorting == True:
         df = sort_columns_high_to_low(df)
         fig = px.line(df, x=df.index, y=df.columns, color_discrete_sequence=color_sequence)
@@ -131,14 +132,14 @@ def plot_dataframe(df, color_sequence, sorting = True):
     )
 
     return fig
-    
-def plot_dataframe_moving_average(df, color_sequence = "red"):
-    window_size = 100
+
+def plot_dataframe_moving_average(df, color_sequence = "red", window_size = 168):
+    window_size = window_size
     moving_avg = df.rolling(window=window_size).mean()
     if color_sequence == "red":
         fig = px.line(moving_avg, x=moving_avg.index, y=moving_avg.columns)
         fig.update_traces(
-        name = "Glidende gjennomsnitt",
+        name = "Glidende gjennomsnitt over 1 uke",
         line=dict(
             width=1,
             #color = color_sequence
@@ -235,7 +236,7 @@ def merge_plots(fig1, fig2):
 
     return fig
 
-def show_metrics(df, color_sequence, sorting = "energi", state = True):
+def show_metrics(df, color_sequence, sorting = "energi"):
 #    c1, c2 = st.columns(2)
     
     if sorting == "energi":
@@ -280,11 +281,11 @@ def show_metrics(df, color_sequence, sorting = "energi", state = True):
             #--
             #st.write(df)
             df_option = df[df.columns[i]].to_frame()
-            fig1 = plot_dataframe(df = df_option, color_sequence = color_sequence[i], sorting = False)
-            fig2 = plot_dataframe_moving_average(df = df_option)
-            fig3 = merge_plots(fig1, fig2)
-            with st.expander("Plot og data", expanded = state):
+            with st.expander("Plot og data"):
                 with chart_container(df_option, tabs = ["Årlig energibehov", "Se data", "Eksporter data"], export_formats=["CSV"]):
+                    fig1 = plot_dataframe(df = df_option, color_sequence = color_sequence[i], sorting = False)
+                    fig2 = plot_dataframe_moving_average(df = df_option, window_size = 100)
+                    fig3 = merge_plots(fig1, fig2)
                     st.plotly_chart(fig3, use_container_width = True, config = {'displayModeBar': False})
                     #st.plotly_chart(fig1, use_container_width = True, config = {'displayModeBar': False})
                     #st.plotly_chart(fig2, use_container_width = True, config = {'displayModeBar': False})
@@ -300,43 +301,46 @@ def main():
         st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 
     st.title("Varighetskurver for hele området")
-    st.write("Skru av og på varighetskurvene i tegnforklaringen for å isolere ulike scenarier.")
+    
     df = csv_to_df(folder_path = "data")
 #    df = select_scenario(df)
     #color_sequence = px.colors.qualitative.Dark2
     color_sequence = [
-    "#1d3c34",
-    "#48a23f",
-    "#FFC358",
-    "#ff5733",
-    "#33FF57",
-    "#5733FF",
-    "#FF33E6",
-    "#33E6FF",
-    "#FF5733",
-    "#FF33E6",
-    "#5733FF",
-    "#33E6FF",
+    "#c07800", #bergvarme
+    "#48a23f", #bergvarmesolfjernvarme
+    "#1d3c34", #fjernvarme
+    "#b7dc8f", #fremtidssituasjon
+    "#2F528F", #luftluft
+    "#3Bf81C", #merlokalproduksjon
+    "#AfB9AB", #nåsituasjon
+    "#254275", #oppgradert
+    "#767171", #referansesituasjon
+    "#ffc358", #solceller
 ]
 
+    with chart_container(df, tabs = ["Varighetskurver", "Se data", "Eksporter data"], export_formats=["CSV"]):
+        st.write("Skru av og på varighetskurvene i tegnforklaringen for å isolere ulike scenarier.")
+        fig = plot_dataframe(df = df, color_sequence = color_sequence, sorting = True)
+        st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
 
-    fig = plot_dataframe(df = df, color_sequence = color_sequence, sorting = True)
-    st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
-    with st.expander("Se data"):
-        st.write(df)
     #--
-    st.title("Analyse")
-    fig1 = plot_dataframe_moving_average(df = df, color_sequence = color_sequence)
-    st.plotly_chart(fig1, use_container_width = True, config = {'displayModeBar': False})
+    st.title("Glidende gjennomsnitt")
+    selected_window_size = st.slider("Periode (uker)", min_value = 1, value = 1, max_value=8, step = 1) * 168
+    with chart_container(df, tabs = ["Årlig energibehov", "Se data", "Eksporter data"], export_formats=["CSV"]):
+        fig1 = plot_dataframe_moving_average(df = df, color_sequence = color_sequence, window_size = selected_window_size)
+        st.plotly_chart(fig1, use_container_width = True, config = {'displayModeBar': False})
     
     #--
     st.title("Scenarier")
-    expansion_state = st.toggle("Vis plot", value = False)
+    #expansion_state = st.toggle("Vis plot", value = False)
+    #expansion_state = True
+    #if expansion_state:
+        #st.experimental_rerun()
     tab1, tab2 = st.tabs(["**Effekt**sortering (høyeste til laveste)", "**Energi**sortering (høyeste til laveste)"])
     with tab1:
-        show_metrics(df, color_sequence, sorting = "effekt", state = expansion_state)
+        show_metrics(df, color_sequence, sorting = "effekt")
     with tab2:
-        show_metrics(df, color_sequence, sorting = "energi", state = expansion_state)
+        show_metrics(df, color_sequence, sorting = "energi")
 
     st.title("Scenariobygger")
     energy_dicts_of_dicts, scenario_names = read_scenario_file_excel(file = "scenarier.xlsx")
