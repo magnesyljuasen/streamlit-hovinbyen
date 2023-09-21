@@ -86,7 +86,7 @@ def plot_dataframe(df, color_sequence, sorting = True):
     
     
     fig.update_yaxes(
-        range=[0, 70],
+        range=[0, 600],
         title_text='Effekt [MW]',
         mirror=True,
         ticks="outside",
