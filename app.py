@@ -250,7 +250,32 @@ def rename_keys(dictionary, key_mapping):
             new_dictionary[new_key] = None  # Set to None if old key not found
     return new_dictionary
 
+def string_to_number(x):
+    if x == None:
+        return 0
+    elif x == "00":
+        return 0
+    elif len(x) == 2 and x != None:
+        return int(x[1:2])
+    elif len(x) == 3 and x != None:
+        return int(x[1:3])
+    elif len(x) == 4 and x != None: # 100
+        return int(x[1:4])
+
 def plot_energy_dict(energy_dict):
+    key_mapping = {
+    'Hus',
+    'Leilighet',
+    'Kontor',
+    'Butikk',
+    'Hotell',
+    'Barnehage',
+    'Skole',
+    'Universitet',
+    'Kultur',
+    'Sykehjem',
+    'Andre',
+    }
 #    COLUMN_NAMES = {
 #        "V" : "Luft luft varmepumpe",
 #        "S" : "Solceller", 
@@ -269,24 +294,9 @@ def plot_energy_dict(energy_dict):
         if new_column_names != None:
             break
     df_splitted.columns = new_column_names
-    st.write(df_splitted)
-
-    #for i in range(0, len(df_splitted.columns)):
-    #    new_column_name = str(df_splitted.iloc[i, 0])
-    #    df_splitted.columns[i] = [new_column_name]
-    #    st.write(df_splitted)
-
-
-    # Convert the split values to numeric (excluding None)
-    #numeric_values = split_values.applymap(lambda x: float(x) if x is not None else None)
-
-    # Create columns for each letter component
-#    for i, letter in enumerate(letters):
-#        df[f'Letter_{i + 1}'] = numeric_values[i]
-
-    # Create a stacked bar chart using Plotly Express
-#    fig = px.bar(df, x='Category', y=df.columns[3:], title='Percentage Breakdown',
-#                 labels={'value': 'Percentage'}, barmode='stack')
+    df_splitted = df_splitted.applymap(string_to_number)
+    df_splitted.index = key_mapping
+    st.bar_chart(df_splitted)
 
 
 def show_metrics(df, color_sequence, sorting = "energi"):
