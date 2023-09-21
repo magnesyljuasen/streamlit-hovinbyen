@@ -241,9 +241,56 @@ def merge_plots(fig1, fig2):
 
     return fig
 
-def show_metrics(df, color_sequence, sorting = "energi"):
-#    c1, c2 = st.columns(2)
+def rename_keys(dictionary, key_mapping):
+    new_dictionary = {}
+    for old_key, new_key in key_mapping.items():
+        if old_key in dictionary:
+            new_dictionary[new_key] = dictionary[old_key]
+        else:
+            new_dictionary[new_key] = None  # Set to None if old key not found
+    return new_dictionary
+
+def plot_energy_dict(energy_dict):
+#    COLUMN_NAMES = {
+#        "V" : "Luft luft varmepumpe",
+#        "S" : "Solceller", 
+#        "F" : "Fjernvarme",
+#        "O" : "Oppgradert byggestandard",
+#        "G" : "Bergvarme",
+#    }
+    letters = '_'
+    df = pd.DataFrame(list(energy_dict.items()), columns=['Category', 'Value'])
+
+    # Split the 'Value' column based on the provided letters
+    df_splitted = df['Value'].str.split(f'[{letters}]', expand=True)
     
+    for j in range(0, 10):
+        new_column_names = [f'{df_splitted.iloc[j, i]}' for i in range(len(df_splitted.columns))]
+        if new_column_names != None:
+            break
+    df_splitted.columns = new_column_names
+    st.write(df_splitted)
+
+    #for i in range(0, len(df_splitted.columns)):
+    #    new_column_name = str(df_splitted.iloc[i, 0])
+    #    df_splitted.columns[i] = [new_column_name]
+    #    st.write(df_splitted)
+
+
+    # Convert the split values to numeric (excluding None)
+    #numeric_values = split_values.applymap(lambda x: float(x) if x is not None else None)
+
+    # Create columns for each letter component
+#    for i, letter in enumerate(letters):
+#        df[f'Letter_{i + 1}'] = numeric_values[i]
+
+    # Create a stacked bar chart using Plotly Express
+#    fig = px.bar(df, x='Category', y=df.columns[3:], title='Percentage Breakdown',
+#                 labels={'value': 'Percentage'}, barmode='stack')
+
+
+def show_metrics(df, color_sequence, sorting = "energi"):
+
     if sorting == "energi":
         max_values = df.sum()
     else:
@@ -255,11 +302,7 @@ def show_metrics(df, color_sequence, sorting = "energi"):
     reference_max = np.max(df["Referansesituasjon"])
     reference_sum = np.sum(df["Referansesituasjon"]) / 1000
     for i in range(0, len(options)):
-#        if (i % 2):
-#            col = c1
-#        else:
-#            col = c2
-#        with col:
+
         series = df[options[i]]
         max_value = rounding_to_int(np.max(series))
         sum_value = rounding_to_int(np.sum(series)/1000)
@@ -280,9 +323,9 @@ def show_metrics(df, color_sequence, sorting = "energi"):
                 delta_2 = "Ingen reduksjon"
 
             with column_1:
-                st.metric(f"Maksimal kjøpt effekt fra nettet", value = f"{max_value} MW", delta = delta_1, delta_color=delta_color_1)
+                st.metric(f"Maksimal kjøpt effekt fra nettet", value = f"{max_value:,} MW".replace(",", " "), delta = delta_1, delta_color=delta_color_1)
             with column_2:
-                st.metric(f"Kjøpt energi fra nettet", value = f"{sum_value} GWH/år", delta = delta_2, delta_color=delta_color_2)
+                st.metric(f"Kjøpt energi fra nettet", value = f"{sum_value:,} GWH/år".replace(",", " "), delta = delta_2, delta_color=delta_color_2)
             #--
             #st.write(df)
             df_option = df[df.columns[i]].to_frame()
@@ -324,13 +367,13 @@ def main():
 ]
 
     with chart_container(df, tabs = ["Varighetskurver", "Se data", "Eksporter data"], export_formats=["CSV"]):
-        st.write("Skru av og på varighetskurvene i tegnforklaringen for å isolere ulike scenarier.")
+        st.info("Skru av og på varighetskurvene i tegnforklaringen for å isolere ulike scenarier.")
         fig = plot_dataframe(df = df, color_sequence = color_sequence, sorting = True)
         st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
 
     #--
     st.title("Glidende gjennomsnitt")
-    selected_window_size = st.slider("Periode (uker)", min_value = 1, value = 1, max_value=8, step = 1) * 168
+    selected_window_size = st.slider("Periode (uker)", min_value = 1, value = 2, max_value=3, step = 1) * 168
     with chart_container(df, tabs = ["Årlig energibehov", "Se data", "Eksporter data"], export_formats=["CSV"]):
         fig1 = plot_dataframe_moving_average(df = df, color_sequence = color_sequence, window_size = selected_window_size)
         st.plotly_chart(fig1, use_container_width = True, config = {'displayModeBar': False})
@@ -349,11 +392,50 @@ def main():
 
     st.title("Scenariobygger")
     energy_dicts_of_dicts, scenario_names = read_scenario_file_excel(file = "scenarier.xlsx")
+
+
+    key_mapping = {
+    'A': 'Hus',
+    'B': 'Leilighet',
+    'C': 'Kontor',
+    'D': 'Butikk',
+    'E': 'Hotell',
+    'F': 'Barnehage',
+    'G': 'Skole',
+    'H': 'Universitet',
+    'I': 'Kultur',
+    'J': 'Sykehjem',
+    'L': 'Andre',
+    }
+    area_string = "ABC"
     for i in range(0, len(energy_dicts_of_dicts)):
         scenario_name = scenario_names[i]
-        st.write(scenario_name)
-        st.write(energy_dicts_of_dicts[i])
+        energy_dicts = energy_dicts_of_dicts[i]
+        for j in range(0, len(energy_dicts)):
+            area = area_string[j]
+            energy_dict = energy_dicts[area]
+            #--
+            if "Andre.1" in energy_dict:
+                del energy_dict["Andre.1"]
+            energy_dict = rename_keys(energy_dict, key_mapping)
+            #--
+            if area == "A":
+                energy_area = "Fjernvarmeområde"
+            elif area == "B":
+                energy_area = "Tynt løsmassedekke"
+            elif area == "C":
+                energy_area = "Tykt løsmassedekke"
+            
+            st.markdown("---")
+            st.write(scenario_name)
+            st.write(energy_area)
+            plot_energy_dict(energy_dict)
 
+
+
+    
+
+    
 
 if __name__ == '__main__':
     main()
