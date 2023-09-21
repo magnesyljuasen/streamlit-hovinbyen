@@ -75,7 +75,7 @@ def plot_dataframe(df, color_sequence, sorting = True):
 
         fig.update_traces(
             line=dict(
-                width=0.5, 
+                width=1, 
             ))
         
         fig.update_xaxes(
@@ -311,7 +311,7 @@ def main():
 #    df = select_scenario(df)
     #color_sequence = px.colors.qualitative.Dark2
     color_sequence = [
-    "#c07800", #bergvarme
+    "#c76900", #bergvarme
     "#48a23f", #bergvarmesolfjernvarme
     "#1d3c34", #fjernvarme
     "#b7dc8f", #fremtidssituasjon
