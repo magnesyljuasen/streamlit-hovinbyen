@@ -83,6 +83,7 @@ def plot_dataframe(df, color_sequence, sorting = True):
             )
     else:
         fig = px.area(df, x=df.index, y=df.columns)
+       
         fig.update_traces(
             line=dict(
                 width=0, 
@@ -106,8 +107,11 @@ def plot_dataframe(df, color_sequence, sorting = True):
         linecolor="black",
         gridcolor="lightgrey",
         )
+    #-#--
+    #--
     fig["data"][0]["showlegend"] = True
     fig.update_layout(
+        #height = 1000,
         margin=dict(l=50,r=50,b=10,t=10,pad=0),
         legend={'title_text':''},
         barmode="stack", 
@@ -117,6 +121,109 @@ def plot_dataframe(df, color_sequence, sorting = True):
     
  
     fig.update_yaxes(
+        range=[-400, 600],
+        title_text='Effekt [MW]',
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+    )
+
+    return fig
+    
+def plot_dataframe_moving_average(df, color_sequence = "red"):
+    window_size = 100
+    moving_avg = df.rolling(window=window_size).mean()
+    if color_sequence == "red":
+        fig = px.line(moving_avg, x=moving_avg.index, y=moving_avg.columns)
+        fig.update_traces(
+        name = "Glidende gjennomsnitt",
+        line=dict(
+            width=1,
+            #color = color_sequence
+            color = "red",
+        ))
+    else:
+        fig = px.line(moving_avg, x=moving_avg.index, y=moving_avg.columns, color_discrete_sequence=color_sequence)
+
+    fig.update_traces(
+        #name = df.co,
+        line=dict(
+            width=1,
+            #color = color_sequence
+        ))
+    fig.update_layout(
+        #legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)"),
+        xaxis = dict(
+            tickmode = 'array',
+            tickvals = [0, 24 * (31), 24 * (31 + 28), 24 * (31 + 28 + 31), 24 * (31 + 28 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31)],
+            ticktext = ["1.jan", "", "1.mar", "", "1.mai", "", "1.jul", "", "1.sep", "", "1.nov", "", "1.jan"]
+            )
+    )
+    fig.update_xaxes(
+    range=[0, 8760],
+    title_text='',
+    mirror=True,
+    ticks="outside",
+    showline=True,
+    linecolor="black",
+    gridcolor="lightgrey",
+    )
+    #-
+    fig["data"][0]["showlegend"] = True
+    fig.update_layout(
+        margin=dict(l=50,r=50,b=10,t=10,pad=0),
+        legend={'title_text':''},
+        barmode="stack", 
+        plot_bgcolor="white", paper_bgcolor="white",
+        legend_traceorder="reversed",
+        )
+
+
+    fig.update_yaxes(
+        range=[-100, 450],
+        title_text='Effekt [MW]',
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+    )
+
+    return fig
+
+def merge_plots(fig1, fig2):
+    fig = go.Figure(data=fig1.data + fig2.data)
+    fig.update_layout(
+        legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)"),
+        xaxis = dict(
+            tickmode = 'array',
+            tickvals = [0, 24 * (31), 24 * (31 + 28), 24 * (31 + 28 + 31), 24 * (31 + 28 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31)],
+            ticktext = ["1.jan", "", "1.mar", "", "1.mai", "", "1.jul", "", "1.sep", "", "1.nov", "", "1.jan"]
+            )
+    )
+    fig.update_xaxes(
+    range=[0, 8760],
+    title_text='',
+    mirror=True,
+    ticks="outside",
+    showline=True,
+    linecolor="black",
+    gridcolor="lightgrey",
+    )
+    #-
+    fig["data"][0]["showlegend"] = True
+    fig.update_layout(
+        margin=dict(l=50,r=50,b=10,t=10,pad=0),
+        legend={'title_text':''},
+        barmode="stack", 
+        plot_bgcolor="white", paper_bgcolor="white",
+        legend_traceorder="reversed",
+        )
+
+
+    fig.update_yaxes(
         range=[0, 600],
         title_text='Effekt [MW]',
         mirror=True,
@@ -125,8 +232,8 @@ def plot_dataframe(df, color_sequence, sorting = True):
         linecolor="black",
         gridcolor="lightgrey",
     )
+
     return fig
-    
 
 def show_metrics(df, color_sequence, sorting = "energi", state = True):
 #    c1, c2 = st.columns(2)
@@ -173,10 +280,14 @@ def show_metrics(df, color_sequence, sorting = "energi", state = True):
             #--
             #st.write(df)
             df_option = df[df.columns[i]].to_frame()
-            fig = plot_dataframe(df = df_option, color_sequence = color_sequence[i], sorting = False)
+            fig1 = plot_dataframe(df = df_option, color_sequence = color_sequence[i], sorting = False)
+            fig2 = plot_dataframe_moving_average(df = df_option)
+            fig3 = merge_plots(fig1, fig2)
             with st.expander("Plot og data", expanded = state):
                 with chart_container(df_option, tabs = ["Årlig energibehov", "Se data", "Eksporter data"], export_formats=["CSV"]):
-                    st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
+                    st.plotly_chart(fig3, use_container_width = True, config = {'displayModeBar': False})
+                    #st.plotly_chart(fig1, use_container_width = True, config = {'displayModeBar': False})
+                    #st.plotly_chart(fig2, use_container_width = True, config = {'displayModeBar': False})
             #st.markdown("---")
 
 def main():
@@ -213,6 +324,11 @@ def main():
     st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
     with st.expander("Se data"):
         st.write(df)
+    #--
+    st.title("Analyse")
+    fig1 = plot_dataframe_moving_average(df = df, color_sequence = color_sequence)
+    st.plotly_chart(fig1, use_container_width = True, config = {'displayModeBar': False})
+    
     #--
     st.title("Scenarier")
     expansion_state = st.toggle("Vis plot", value = False)
