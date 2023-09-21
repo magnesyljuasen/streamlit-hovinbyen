@@ -6,6 +6,35 @@ from plotly.subplots import make_subplots
 import numpy as np
 import datetime
 import plotly.express as px
+from streamlit_extras.chart_container import chart_container
+
+def read_scenario_file_excel(file = "scenarier.xlsx"):
+    buildingtype_to_buildingcode = {
+        "Hus" : "A",
+        "Leilighet" : "B",
+        "Kontor" : "C",
+        "Butikk" : "D",
+        "Hotell" : "E",
+        "Barnehage" : "F",
+        "Skole" : "G",
+        "Universitet" : "H",
+        "Kultur" : "I",
+        "Sykehjem" : "J",
+        "Andre" : "L"
+        }
+    variable_dict = {}
+    xls_keys = list(pd.read_excel(file, sheet_name = None).keys())
+    for key in xls_keys:
+        df = pd.read_excel(file, sheet_name = key, index_col=0)
+        df = df.rename(columns = buildingtype_to_buildingcode)
+        df = df.T
+        energy_dicts = df.to_dict()
+        variable_dict[key] = energy_dicts
+    #--
+    energy_dicts_of_dicts = []
+    for i in range(0, len(variable_dict)):
+        energy_dicts_of_dicts.append(variable_dict[xls_keys[i]])
+    return energy_dicts_of_dicts, xls_keys
 
 def csv_to_df(folder_path = "data"):
     csv_file_list = []
@@ -57,7 +86,8 @@ def plot_dataframe(df, color_sequence, sorting = True):
         fig.update_traces(
             line=dict(
                 width=0, 
-                color = color_sequence
+                #color = color_sequence
+                color = "black"
             ))
         fig.update_layout(
             legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)"),
@@ -78,13 +108,14 @@ def plot_dataframe(df, color_sequence, sorting = True):
         )
     fig["data"][0]["showlegend"] = True
     fig.update_layout(
+        margin=dict(l=50,r=50,b=10,t=10,pad=0),
         legend={'title_text':''},
-        barmode="stack", margin=dict(l=20, r=20, t=20, b=20),
+        barmode="stack", 
         plot_bgcolor="white", paper_bgcolor="white",
         legend_traceorder="reversed",
         )
     
-    
+ 
     fig.update_yaxes(
         range=[0, 600],
         title_text='Effekt [MW]',
@@ -94,62 +125,73 @@ def plot_dataframe(df, color_sequence, sorting = True):
         linecolor="black",
         gridcolor="lightgrey",
     )
-    # Display the plot
-    st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
+    return fig
+    
 
-def show_metrics(df, color_sequence):
-    c1, c2 = st.columns(2)
+def show_metrics(df, color_sequence, sorting = "energi", state = True):
+#    c1, c2 = st.columns(2)
+    
+    if sorting == "energi":
+        max_values = df.sum()
+    else:
+        max_values = df.max()
+    column_max_dict = dict(max_values)
+    sorted_columns = ['Referansesituasjon'] + [col for col, _ in sorted(column_max_dict.items(), key=lambda x: x[1], reverse=True) if col != 'Referansesituasjon']
+    df = df[sorted_columns]
     options = df.columns
     reference_max = np.max(df["Referansesituasjon"])
     reference_sum = np.sum(df["Referansesituasjon"]) / 1000
     for i in range(0, len(options)):
-        if (i % 2):
-            col = c1
-        else:
-            col = c2
-        with col:
-            series = df[options[i]]
-            max_value = rounding_to_int(np.max(series))
-            sum_value = rounding_to_int(np.sum(series)/1000)
-            max_value_reduction = int(((reference_max - max_value)/reference_max) * 100)
-            sum_value_reduction = int(((reference_sum - sum_value)/reference_sum) * 100)
-            with st.container():
-                st.header(f"{df.columns[i]}")
-                column_1, column_2 = st.columns(2)
-                delta_color_1 = "inverse"
-                delta_1 = f"{-max_value_reduction} %"
-                delta_color_2 = "inverse"
-                delta_2 = f"{-sum_value_reduction} %"
-                if max_value_reduction == 0:
-                    delta_color_1 = "off"
-                    delta_1 = "Ingen reduksjon"
-                if sum_value_reduction == 0:
-                    delta_color_2 = "off"
-                    delta_2 = "Ingen reduksjon"
+#        if (i % 2):
+#            col = c1
+#        else:
+#            col = c2
+#        with col:
+        series = df[options[i]]
+        max_value = rounding_to_int(np.max(series))
+        sum_value = rounding_to_int(np.sum(series)/1000)
+        max_value_reduction = int(((reference_max - max_value)/reference_max) * 100)
+        sum_value_reduction = int(((reference_sum - sum_value)/reference_sum) * 100)
+        with st.container():
+            st.subheader(f"{df.columns[i]}")
+            column_1, column_2 = st.columns(2)
+            delta_color_1 = "inverse"
+            delta_1 = f"{-max_value_reduction} %"
+            delta_color_2 = "inverse"
+            delta_2 = f"{-sum_value_reduction} %"
+            if max_value_reduction == 0:
+                delta_color_1 = "off"
+                delta_1 = "Ingen reduksjon"
+            if sum_value_reduction == 0:
+                delta_color_2 = "off"
+                delta_2 = "Ingen reduksjon"
 
-                with column_1:
-                    st.metric(f"Maksimal kjøpt effekt fra nettet", value = f"{max_value} MW", delta = delta_1, delta_color=delta_color_1)
-                with column_2:
-                    st.metric(f"Kjøpt energi fra nettet", value = f"{sum_value} GWH/år", delta = delta_2, delta_color=delta_color_2)
-                #--
-                #st.write(df)
-                df_option = df[df.columns[i]].to_frame()
-                plot_dataframe(df = df_option, color_sequence = color_sequence[i], sorting = False)
-                with st.expander("Se data"):
-                    st.write(df_option)
-                st.markdown("---")
+            with column_1:
+                st.metric(f"Maksimal kjøpt effekt fra nettet", value = f"{max_value} MW", delta = delta_1, delta_color=delta_color_1)
+            with column_2:
+                st.metric(f"Kjøpt energi fra nettet", value = f"{sum_value} GWH/år", delta = delta_2, delta_color=delta_color_2)
+            #--
+            #st.write(df)
+            df_option = df[df.columns[i]].to_frame()
+            fig = plot_dataframe(df = df_option, color_sequence = color_sequence[i], sorting = False)
+            with st.expander("Plot og data", expanded = state):
+                with chart_container(df_option, tabs = ["Årlig energibehov", "Se data", "Eksporter data"], export_formats=["CSV"]):
+                    st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
+            #st.markdown("---")
 
 def main():
     st.set_page_config(
     page_title="Nedre Glomma",
     page_icon="📈",
-    layout="wide")
+    layout="centered")
 
     with open("app.css") as f:
         st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
-    st.title("Overordnede resultater")
+
+    st.title("Varighetskurver for hele området")
+    st.write("Skru av og på varighetskurvene i tegnforklaringen for å isolere ulike scenarier.")
     df = csv_to_df(folder_path = "data")
-    df = select_scenario(df)
+#    df = select_scenario(df)
     #color_sequence = px.colors.qualitative.Dark2
     color_sequence = [
     "#1d3c34",
@@ -167,11 +209,26 @@ def main():
 ]
 
 
-    plot_dataframe(df = df, color_sequence = color_sequence, sorting = True)
+    fig = plot_dataframe(df = df, color_sequence = color_sequence, sorting = True)
+    st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
     with st.expander("Se data"):
         st.write(df)
     #--
-    show_metrics(df, color_sequence)
+    st.title("Scenarier")
+    expansion_state = st.toggle("Vis plot", value = False)
+    tab1, tab2 = st.tabs(["**Effekt**sortering (høyeste til laveste)", "**Energi**sortering (høyeste til laveste)"])
+    with tab1:
+        show_metrics(df, color_sequence, sorting = "effekt", state = expansion_state)
+    with tab2:
+        show_metrics(df, color_sequence, sorting = "energi", state = expansion_state)
+
+    st.title("Scenariobygger")
+    energy_dicts_of_dicts, scenario_names = read_scenario_file_excel(file = "scenarier.xlsx")
+    for i in range(0, len(energy_dicts_of_dicts)):
+        scenario_name = scenario_names[i]
+        st.write(scenario_name)
+        st.write(energy_dicts_of_dicts[i])
+
 
 if __name__ == '__main__':
     main()
