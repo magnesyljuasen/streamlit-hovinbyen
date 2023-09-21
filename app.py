@@ -401,6 +401,7 @@ def main():
         show_metrics(df, color_sequence, sorting = "energi")
 
     st.title("Scenariobygger")
+    st.warning("Under arbeid")
     energy_dicts_of_dicts, scenario_names = read_scenario_file_excel(file = "scenarier.xlsx")
 
 
