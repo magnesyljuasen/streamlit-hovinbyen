@@ -72,6 +72,11 @@ def plot_dataframe(df, color_sequence, sorting = True):
         df = sort_columns_high_to_low(df)
         fig = px.line(df, x=df.index, y=df.columns, color_discrete_sequence=color_sequence)
         fig.update_layout(legend=dict(bgcolor="rgba(0,0,0,0)"))
+
+        fig.update_traces(
+            line=dict(
+                width=0.5, 
+            ))
         
         fig.update_xaxes(
             range=[0, 8760],
