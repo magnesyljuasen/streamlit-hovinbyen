@@ -71,7 +71,9 @@ def plot_dataframe(df, color_sequence, sorting = True):
     if sorting == True:
         df = sort_columns_high_to_low(df)
         fig = px.line(df, x=df.index, y=df.columns, color_discrete_sequence=color_sequence)
-        fig.update_layout(legend=dict(bgcolor="rgba(0,0,0,0)"))
+        fig.update_layout(
+            legend=dict(bgcolor="rgba(0,0,0,0)"),
+            )
 
         fig.update_traces(
             line=dict(
@@ -325,6 +327,48 @@ def plot_energy_dict(energy_dict):
     df_splitted.index = key_mapping
     st.bar_chart(df_splitted)
 
+def show_building_statistics():
+    df2 = pd.read_csv("data/Referansesituasjon_filtered.csv")
+    grouped_df = df2.groupby('BYGNINGSTYPE_NAVN').size().reset_index(name='COUNT')
+    fig = px.bar(grouped_df, x='BYGNINGSTYPE_NAVN', y='COUNT')
+    fig.update_layout(
+    autosize=True,
+    margin=dict(l=0,r=0,b=10,t=10,pad=0),
+    yaxis_title="Antall bygg",
+    xaxis_title="Bygningstyper",
+    plot_bgcolor="white",
+    legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)"),
+    )
+    fig.update_xaxes(
+        ticks="outside",
+        linecolor="black",
+        gridcolor="lightgrey",
+    )
+    fig.update_yaxes(
+        range=[0, 30000],
+        tickformat=",",
+        ticks="outside",
+        linecolor="black",
+        gridcolor="lightgrey",
+    )
+    fig.update_layout(separators="* .*")
+    st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
+    st.markdown("---")
+    #-- pie
+    pie_fig = px.pie(data_frame=grouped_df, names = 'BYGNINGSTYPE_NAVN', values = 'COUNT')
+    # Customize the layout for the pie chart
+    pie_fig.update_layout(
+        autosize=True,
+        margin=dict(l=0, r=0, b=10, t=10, pad=0),
+        plot_bgcolor="white",
+        #legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)"),
+    )
+    pie_fig.update_traces(hoverinfo='label+percent+name', textinfo='none')
+    #pie_fig.update(layout_title_text='Van Gogh: 5 Most Prominent Colors Shown Proportionally', layout_showlegend=False)
+
+    # Assuming you are using Streamlit to display the chart
+    st.plotly_chart(pie_fig, use_container_width=True, config={'displayModeBar': False})
+
 
 def show_metrics(df, color_sequence, sorting = "energi"):
     if sorting == "energi":
@@ -371,7 +415,7 @@ def show_metrics(df, color_sequence, sorting = "energi"):
             oppgraderes_count = len(df1[df1['oppgraderes'] == True])
             totalt_count = len(df1)
             #--
-            with st.expander("Antall bygg", expanded = True):
+            with st.expander("Antall bygg", expanded = False):
                 df_bar = {
                 'Type tiltak': [
                     'Grunnvarme',
@@ -408,7 +452,7 @@ def show_metrics(df, color_sequence, sorting = "energi"):
             #--
             #st.write(df)
             df_option = df[df.columns[i]].to_frame()
-            with st.expander("Plot og data"):
+            with st.expander("Plot og data", expanded = False):
                 with chart_container(df_option, tabs = ["Årlig energibehov", "Se data", "Eksporter data"], export_formats=["CSV"]):
                     fig1 = plot_dataframe(df = df_option, color_sequence = color_sequence[i], sorting = False)
                     fig2 = plot_dataframe_moving_average(df = df_option, window_size = 100)
@@ -427,70 +471,73 @@ def main():
     with open("app.css") as f:
         st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 
-    st.title("Varighetskurver for hele området")
-    
-    df = csv_to_df(folder_path = "data")
-#    df = select_scenario(df)
-    #color_sequence = px.colors.qualitative.Dark2
-    color_sequence = [
-    "#c76900", #bergvarme
-    "#48a23f", #bergvarmesolfjernvarme
-    "#1d3c34", #fjernvarme
-    "#b7dc8f", #fremtidssituasjon
-    "#2F528F", #luftluft
-    "#3Bf81C", #merlokalproduksjon
-    "#AfB9AB", #nåsituasjon
-    "#254275", #oppgradert
-    "#767171", #referansesituasjon
-    "#ffc358", #solceller
-]
+    tab1_site, tab2_site, tab3_site = st.tabs(["Energiscenarier", "Bygningsstatistikk", "Varighetskurver og glidende gjennomsnitt"])
+    with tab3_site:
+        st.info("Resultatene som vises her gjelder for alle bygg i området.", icon="ℹ️")
+        st.write("**Varighetskurver for hele området**")
+        df = csv_to_df(folder_path = "data")
+    #   df = select_scenario(df)
+        #color_sequence = px.colors.qualitative.Dark2
+        color_sequence = [
+        "#c76900", #bergvarme
+        "#48a23f", #bergvarmesolfjernvarme
+        "#1d3c34", #fjernvarme
+        "#b7dc8f", #fremtidssituasjon
+        "#2F528F", #luftluft
+        "#3Bf81C", #merlokalproduksjon
+        "#AfB9AB", #nåsituasjon
+        "#254275", #oppgradert
+        "#767171", #referansesituasjon
+        "#ffc358", #solceller
+    ]
 
-    with chart_container(df, tabs = ["Varighetskurver", "Se data", "Eksporter data"], export_formats=["CSV"]):
-        st.info("Skru av og på varighetskurvene i tegnforklaringen for å isolere ulike scenarier.", icon="ℹ️")
+        #with chart_container(df, tabs = ["Varighetskurver", "Se data", "Eksporter data"], export_formats=["CSV"]):
         fig = plot_dataframe(df = df, color_sequence = color_sequence, sorting = True)
         st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
+        with st.expander("Se data"):
+            st.write(df)
 
-    #--
-    st.title("Glidende gjennomsnitt")
-    st.info("Skru av og på kurvene i tegnforklaringen for å isolere ulike scenarier.", icon="ℹ️")
-    #selected_window_size = st.slider("Periode (uker)", min_value = 1, value = 2, max_value=3, step = 1) * 168
-    with chart_container(df, tabs = ["Årlig energibehov", "Se data", "Eksporter data"], export_formats=["CSV"]):
+        #--
+        st.write("**Glidende gjennomsnitt**")
+        #selected_window_size = st.slider("Periode (uker)", min_value = 1, value = 2, max_value=3, step = 1) * 168
+        #with chart_container(df, tabs = ["Årlig energibehov", "Se data", "Eksporter data"], export_formats=["CSV"]):
         fig1 = plot_dataframe_moving_average(df = df, color_sequence = color_sequence, window_size = 168)
         st.plotly_chart(fig1, use_container_width = True, config = {'displayModeBar': False})
+        with st.expander("Se data"):
+            st.write(df)
+        st.warning("Tips! Skru av og på kurvene i tegnforklaringen for å isolere ulike scenarier.", icon="ℹ️")
+        
+        #--
+    with tab2_site:
+        st.header("Bygningsstatistikk")
+        st.write("""Det er totalt **52 834 bygg** i området som er tilgjengelige for energitiltak. 
+                Garasjer, industri og andre bygningskategorier uten energibehov er filtrert bort.""")
+        
+        with st.expander("Vis bygningsstatistikk", expanded = True):
+            show_building_statistics()
     
-    #--
-    st.title("Scenarier")
-    st.write("""Det er totalt **52 834 bygg** i området som er tilgjengelige for energitiltak. 
-             Garasjer, industri og andre bygningskategorier uten energibehov er filtrert bort.""")
-    
-    st.warning("Graf - bygningsstatistikk")
-    df2 = pd.read_csv("data/Referansesituasjon_filtered.csv")
-    #st.write(df2.head())
-    #fig = px.bar(df2, x='BYGNINGSTYPE_NAVN', title='Building Types Count',
-     #        labels={'BYGNINGSTYPE_NAVN': 'Building Type'},
-    #         category_orders={"BYGNINGSTYPE_NAVN": sorted(df['BYGNINGSTYPE_NAVN'].unique())})
-    #st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
-    
-    st.write("""Det er simulert 10 ulike scenarier som vises nedenfor. 
-             Disse er preprossesert, **men fullt mulig å konfigurere og definere som man vil**. 
-             Inndata til simuleringene er et excel-ark der man kan velge prosentsatser for ulike tiltak i ulike energiområder. """)
-    
-    st.write("Eksempler:")
-    st.write(" - • At 50% av alle kontorbygninger innenfor fjernvarmeområdet skal få fjernvarme")
-    st.write(" - • At 70% av alle eneboliger med tynt løsmassedekke skal ha bergvarme.")
-    st.write(" - • At 30% av alle eneboliger skal ha solceller, 50% av de som er innenfor området med tynt løsmassedekke skal ha bergvarme og 20% av eneboligene får oppgradert byggestandard.")
-    
-    st.write("Det er altså mulig å velge enkelttiltak samt kombinasjoner for ulike bygg i ulike energiområder.")
-    st.info("Vi ønsker innspill på hvilke scenarier som er lure å simulere.", icon="ℹ️")
-    #expansion_state = st.toggle("Vis plot", value = False)
-    #expansion_state = True
-    #if expansion_state:
-        #st.experimental_rerun()
-    tab1, tab2 = st.tabs(["**Effekt**sortering (høyeste til laveste)", "**Energi**sortering (høyeste til laveste)"])
-    with tab1:
-        show_metrics(df, color_sequence, sorting = "effekt")
-    with tab2:
-        show_metrics(df, color_sequence, sorting = "energi")
+    with tab1_site:
+        st.header("Energiscenarier")
+        st.write("""Det er simulert 10 ulike scenarier som vises nedenfor. 
+                Disse er preprossesert, **men fullt mulig å konfigurere og definere som man vil**. 
+                Inndata til simuleringene er et excel-ark der man kan velge prosentsatser for ulike tiltak i ulike energiområder. """)
+        
+        st.write("Eksempler:")
+        st.write(" - • At 50% av alle kontorbygninger innenfor fjernvarmeområdet skal få fjernvarme")
+        st.write(" - • At 70% av alle eneboliger med tynt løsmassedekke skal ha bergvarme.")
+        st.write(" - • At 30% av alle eneboliger skal ha solceller, 50% av de som er innenfor området med tynt løsmassedekke skal ha bergvarme og 20% av eneboligene får oppgradert byggestandard.")
+        
+        st.write("Det er altså mulig å velge enkelttiltak samt kombinasjoner for ulike bygg i ulike energiområder.")
+        st.info("Vi ønsker innspill på hvilke scenarier som er lure å simulere.", icon="ℹ️")
+        #expansion_state = st.toggle("Vis plot", value = False)
+        #expansion_state = True
+        #if expansion_state:
+            #st.experimental_rerun()
+        tab1, tab2 = st.tabs(["**Effekt**sortering (høyeste til laveste)", "**Energi**sortering (høyeste til laveste)"])
+        with tab1:
+            show_metrics(df, color_sequence, sorting = "effekt")
+        with tab2:
+            show_metrics(df, color_sequence, sorting = "energi")
 
    
 if __name__ == '__main__':
