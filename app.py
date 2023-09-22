@@ -272,7 +272,7 @@ def explanation_text_scenario(scenario_name):
         st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (fra oversendt adresseliste) ")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA)")
     if scenario_name == "LuftLuftVarmepumper":
-        st.write(""" Dette scenariet definerer en ekstremsituasjon der alle bygg som ikke hadde grunnvarme/fjernvarme i referansesituasjonen får luft luft varmepumper.""")
+        st.write(""" Dette scenariet definerer en ekstremsituasjon der alle bygg som ikke hadde bergvarme/fjernvarme i referansesituasjonen får luft luft varmepumper.""")
         st.write(""" Her er det simulert energiflyt for: """)
         st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (fra oversendt adresseliste) ")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA)")
@@ -284,11 +284,24 @@ def explanation_text_scenario(scenario_name):
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA)")
         st.write(" 3) 60% av byggene har luft luft varmepumpe og 10% av byggene har solceller")
     if scenario_name == "Solceller":
-        st.write(""" Dette scenariet definerer en ekstremsituasjon der alle bygg som ikke hadde grunnvarme/fjernvarme i referansesituasjonen får solceller.""")
+        st.write(""" Dette scenariet definerer en ekstremsituasjon der alle bygg som ikke hadde bergvarme/fjernvarme i referansesituasjonen får solceller.""")
         st.write(""" Her er det simulert energiflyt for: """)
         st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (fra oversendt adresseliste) ")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA)")
         st.write(" 3) Resten av byggene har solceller")
+    if scenario_name == "Fjernvarme":
+        st.write(""" Dette scenariet definerer en situasjon der alle bygg som **ligger innenfor konsensjonsområdene for fjernvarme og som ikke er eneboliger** får fjernvarme""")
+        st.write(""" Her er det simulert energiflyt for: """)
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (fra oversendt adresseliste) ")
+        st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA)")
+        st.write(" 3) Alle byggene i fjernvarmeområdene som ikke er eneboliger får fjernvarme")
+    if scenario_name == "Fremtidssituasjon2030":
+        st.write(""" Dette scenariet definerer en antatt situasjon for år 2030 med en **moderat økning** når det gjelder bergvarme, fjernvarme, solceller og oppgradering av bygningsmassen.""")
+        st.write(""" Her er det simulert energiflyt for: """)
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (fra oversendt adresseliste) ")
+        st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA)")
+        st.write(""" 3) 30% av bygg får solceller, fjernvarme, bergvarme og 30% av byggene, untatt eneboliger, oppgraderes. 10% av eneboliger oppgraderes. Mer fjernvarme gjelder kun i fjernvarmeområdet for bygninger som ikke er eneboliger, 
+                 og det er mindre bergvarme i områdene med tykt løsmassedekke.""")
 
 
 
@@ -428,7 +441,18 @@ def show_metrics(df, color_sequence, sorting = "energi"):
         max_value_reduction = int(((reference_max - max_value)/reference_max) * 100)
         sum_value_reduction = int(((reference_sum - sum_value)/reference_sum) * 100)
         with st.container():
-            st.subheader(f"{df.columns[i]}")
+            name = df.columns[i]
+            if name == "LuftLuftVarmepumper":
+                name = "Luft-luft-varmepumper"
+            elif name == "Fremtidssituasjon2030":
+                name = "Mulig fremtidssituasjon 2030"
+            elif name == "MerLokalproduksjon":
+                name = "Mer lokalproduksjon"
+            elif name == "OppgradertBygningsmasse":
+                name = "Oppgradert bygningsmasse"
+            elif name == "BergvarmeSolFjernvarme":
+                name = "Bergvarme, sol og fjernvarme"
+            st.subheader(name)
             explanation_text_scenario(df.columns[i])
             column_1, column_2 = st.columns(2)
             delta_color_1 = "inverse"
@@ -448,7 +472,7 @@ def show_metrics(df, color_sequence, sorting = "energi"):
                 st.metric(f"""1. Behov for tilført el-energi fra el-nettet""", value = f"{sum_value:,} GWH/år".replace(",", " "), delta = delta_2, delta_color=delta_color_2)
             #--
             df1 = pd.read_csv(f"data/{df.columns[i]}_filtered.csv", low_memory = False)
-            grunnvarme_count = len(df1[df1['grunnvarme'] == True])
+            bergvarme_count = len(df1[df1['bergvarme'] == True])
             fjernvarme_count = len(df1[df1['fjernvarme'] == True])
             luftluft_count = len(df1[df1['luft_luft_varmepumpe'] == True])
             solceller_count = len(df1[df1['solceller'] == True])
@@ -458,13 +482,13 @@ def show_metrics(df, color_sequence, sorting = "energi"):
             with st.expander("Antall bygg", expanded = False):
                 df_bar = {
                 'Type tiltak': [
-                    'Grunnvarme',
+                    'bergvarme',
                     'Fjernvarme',
                     'Luft-luft-varmepumpe',
                     'Solceller',
                     'Oppgradert bygningsmasse'
                 ],
-                'Antall bygg': [grunnvarme_count, fjernvarme_count, luftluft_count, solceller_count, oppgraderes_count]
+                'Antall bygg': [bergvarme_count, fjernvarme_count, luftluft_count, solceller_count, oppgraderes_count]
                 }
 
                 fig = px.bar(df_bar, x='Type tiltak', y='Antall bygg')
