@@ -261,6 +261,33 @@ def string_to_number(x):
         return int(x[1:3])
     elif len(x) == 4 and x != None: # 100
         return int(x[1:4])
+    
+def explanation_text_scenario(scenario_name):
+    if scenario_name == "Referansesituasjon":
+        st.write(""" Referansesituasjonen definerer nullsituasjonen for området og er den de andre scenariene sammenlignes med. """)
+        st.write(""" Her er det simulert energiflyt for: """)
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (fra oversendt adresseliste) ")
+        st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA)")
+    if scenario_name == "LuftLuftVarmepumper":
+        st.write(""" Dette scenariet definerer en ekstremsituasjon der alle bygg som ikke hadde grunnvarme/fjernvarme i referansesituasjonen får luft luft varmepumper.""")
+        st.write(""" Her er det simulert energiflyt for: """)
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (fra oversendt adresseliste) ")
+        st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA)")
+        st.write(" 3) Resten av byggene har luft luft varmepumpe")
+    if scenario_name == "Nåsituasjon":
+        st.write(""" Nåsituasjonen er et forsøk på å definere området slik det er i dag.""")
+        st.write(""" Her er det simulert energiflyt for: """)
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (fra oversendt adresseliste) ")
+        st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA)")
+        st.write(" 3) 60% av byggene har luft luft varmepumpe og 10% av byggene har solceller")
+    if scenario_name == "Solceller":
+        st.write(""" Dette scenariet definerer en ekstremsituasjon der alle bygg som ikke hadde grunnvarme/fjernvarme i referansesituasjonen får solceller.""")
+        st.write(""" Her er det simulert energiflyt for: """)
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (fra oversendt adresseliste) ")
+        st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA)")
+        st.write(" 3) Resten av byggene har solceller")
+
+
 
 def plot_energy_dict(energy_dict):
     key_mapping = {
@@ -300,7 +327,6 @@ def plot_energy_dict(energy_dict):
 
 
 def show_metrics(df, color_sequence, sorting = "energi"):
-
     if sorting == "energi":
         max_values = df.sum()
     else:
@@ -312,7 +338,6 @@ def show_metrics(df, color_sequence, sorting = "energi"):
     reference_max = np.max(df["Referansesituasjon"])
     reference_sum = np.sum(df["Referansesituasjon"]) / 1000
     for i in range(0, len(options)):
-
         series = df[options[i]]
         max_value = rounding_to_int(np.max(series))
         sum_value = rounding_to_int(np.sum(series)/1000)
@@ -320,6 +345,7 @@ def show_metrics(df, color_sequence, sorting = "energi"):
         sum_value_reduction = int(((reference_sum - sum_value)/reference_sum) * 100)
         with st.container():
             st.subheader(f"{df.columns[i]}")
+            explanation_text_scenario(df.columns[i])
             column_1, column_2 = st.columns(2)
             delta_color_1 = "inverse"
             delta_1 = f"{-max_value_reduction} %"
@@ -336,6 +362,49 @@ def show_metrics(df, color_sequence, sorting = "energi"):
                 st.metric(f"Maksimal kjøpt effekt fra nettet", value = f"{max_value:,} MW".replace(",", " "), delta = delta_1, delta_color=delta_color_1)
             with column_2:
                 st.metric(f"Kjøpt energi fra nettet", value = f"{sum_value:,} GWH/år".replace(",", " "), delta = delta_2, delta_color=delta_color_2)
+            #--
+            df1 = pd.read_csv(f"data/{df.columns[i]}_filtered.csv", low_memory = False)
+            grunnvarme_count = len(df1[df1['grunnvarme'] == True])
+            fjernvarme_count = len(df1[df1['fjernvarme'] == True])
+            luftluft_count = len(df1[df1['luft_luft_varmepumpe'] == True])
+            solceller_count = len(df1[df1['solceller'] == True])
+            oppgraderes_count = len(df1[df1['oppgraderes'] == True])
+            totalt_count = len(df1)
+            #--
+            with st.expander("Antall bygg", expanded = True):
+                df_bar = {
+                'Type tiltak': [
+                    'Grunnvarme',
+                    'Fjernvarme',
+                    'Luft-luft-varmepumpe',
+                    'Solceller',
+                    'Oppgradert bygningsmasse'
+                ],
+                'Antall bygg': [grunnvarme_count, fjernvarme_count, luftluft_count, solceller_count, oppgraderes_count]
+                }
+
+                fig = px.bar(df_bar, x='Type tiltak', y='Antall bygg')
+                fig.update_layout(
+                autosize=True,
+                margin=dict(l=0,r=0,b=10,t=10,pad=0),
+                yaxis_title="Antall bygg med tiltak",
+                plot_bgcolor="white",
+                legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)"),
+                    )
+                fig.update_xaxes(
+                    ticks="outside",
+                    linecolor="black",
+                    gridcolor="lightgrey",
+                )
+                fig.update_yaxes(
+                    range=[0, 52834],
+                    tickformat=",",
+                    ticks="outside",
+                    linecolor="black",
+                    gridcolor="lightgrey",
+                )
+                fig.update_layout(separators="* .*")
+                st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
             #--
             #st.write(df)
             df_option = df[df.columns[i]].to_frame()
@@ -377,7 +446,7 @@ def main():
 ]
 
     with chart_container(df, tabs = ["Varighetskurver", "Se data", "Eksporter data"], export_formats=["CSV"]):
-        st.info("Skru av og på varighetskurvene i tegnforklaringen for å isolere ulike scenarier.")
+        st.info("Skru av og på varighetskurvene i tegnforklaringen for å isolere ulike scenarier.", icon="ℹ️")
         fig = plot_dataframe(df = df, color_sequence = color_sequence, sorting = True)
         st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
 
@@ -390,6 +459,22 @@ def main():
     
     #--
     st.title("Scenarier")
+    st.write("""Det er totalt **52 834 bygg** i området som er tilgjengelige for energitiltak. 
+             Garasjer, industri og andre bygningskategorier uten energibehov er filtrert bort.""")
+    
+    st.warning("Graf - bygningsstatistikk")
+    
+    st.write("""Det er simulert 10 ulike scenarier som vises nedenfor. 
+             Disse er preprossesert, **men fullt mulig å konfigurere og definere som man vil**. 
+             Inndata til simuleringene er et excel-ark der man kan velge prosentsatser for ulike tiltak i ulike energiområder. """)
+    
+    st.write("Eksempler:")
+    st.write(" - • At 50% av alle kontorbygninger innenfor fjernvarmeområdet skal få fjernvarme")
+    st.write(" - • At 70% av alle eneboliger med tynt løsmassedekke skal ha bergvarme.")
+    st.write(" - • At 30% av alle eneboliger skal ha solceller, 50% av de som er innenfor området med tynt løsmassedekke skal ha bergvarme og 20% av eneboligene får oppgradert byggestandard.")
+    
+    st.write("Det er altså mulig å velge enkelttiltak samt kombinasjoner for ulike bygg i ulike energiområder.")
+    st.info("Vi ønsker innspill på hvilke scenarier som er lure å simulere.", icon="ℹ️")
     #expansion_state = st.toggle("Vis plot", value = False)
     #expansion_state = True
     #if expansion_state:
@@ -400,62 +485,6 @@ def main():
     with tab2:
         show_metrics(df, color_sequence, sorting = "energi")
 
-    st.title("Scenariobygger")
-    st.warning("Under arbeid")
-    st.write("- Statistikk for de ulike scenariene")
-    st.write("- Antall bygninger som har fått ulike tiltak")
-    c1, c2 = st.columns(2)
-    with c1:
-        st.metric("Antall bygninger med grunnvarme", value = 40000)
-    with c2:
-        st.metric("Antall bygninger med fjernvarme", value = 10000)
-    """
-    energy_dicts_of_dicts, scenario_names = read_scenario_file_excel(file = "scenarier.xlsx")
-
-
-    key_mapping = {
-    'A': 'Hus',
-    'B': 'Leilighet',
-    'C': 'Kontor',
-    'D': 'Butikk',
-    'E': 'Hotell',
-    'F': 'Barnehage',
-    'G': 'Skole',
-    'H': 'Universitet',
-    'I': 'Kultur',
-    'J': 'Sykehjem',
-    'L': 'Andre',
-    }
-    area_string = "ABC"
-    for i in range(0, len(energy_dicts_of_dicts)):
-        scenario_name = scenario_names[i]
-        energy_dicts = energy_dicts_of_dicts[i]
-        for j in range(0, len(energy_dicts)):
-            area = area_string[j]
-            energy_dict = energy_dicts[area]
-            #--
-            if "Andre.1" in energy_dict:
-                del energy_dict["Andre.1"]
-            energy_dict = rename_keys(energy_dict, key_mapping)
-            #--
-            if area == "A":
-                energy_area = "Fjernvarmeområde"
-            elif area == "B":
-                energy_area = "Tynt løsmassedekke"
-            elif area == "C":
-                energy_area = "Tykt løsmassedekke"
-            
-            st.markdown("---")
-            st.write(scenario_name)
-            st.write(energy_area)
-            plot_energy_dict(energy_dict)
-    """
-
-
-
-    
-
-    
-
+   
 if __name__ == '__main__':
     main()
