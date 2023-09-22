@@ -31,7 +31,7 @@ function Typewrite() {
       setTempText();
       clearInterval(interval)
       if (text != tempText) {
-        var counter = Math.random() * 100 + 50;
+        var counter = 50;
         interval = setInterval(animate, counter)
       } else {
         el.setAttribute('data-content', text)
