@@ -399,7 +399,7 @@ def typewrite(text:str):
 def front_page():
     text = """Hvor mye, når og hvordan kan energieffektivisering og lokal energiproduksjon dempe presset på nettet for å bidra til raskere elektrifisering i området?"""
     typewrited = typewrite(text)
-    st.markdown("<h2 style='text-align: center;'>Systemsmart Nedre Glomma 2.0</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>Systemsmart <br>Nedre Glomma 2.0</h1>", unsafe_allow_html=True)
     with st.container():
         st.components.v1.html(typewrited, height=500, scrolling=False)
     c1, c2 = st.columns(2)
