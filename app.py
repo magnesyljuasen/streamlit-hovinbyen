@@ -359,9 +359,9 @@ def show_metrics(df, color_sequence, sorting = "energi"):
                 delta_2 = "Ingen reduksjon"
 
             with column_1:
-                st.metric(f"Maksimal kjøpt effekt fra nettet", value = f"{max_value:,} MW".replace(",", " "), delta = delta_1, delta_color=delta_color_1)
+                st.metric(f"""1. Maksimalt behov for tilført el-effekt fra el-nettet""", value = f"{max_value:,} MW".replace(",", " "), delta = delta_1, delta_color=delta_color_1)
             with column_2:
-                st.metric(f"Kjøpt energi fra nettet", value = f"{sum_value:,} GWH/år".replace(",", " "), delta = delta_2, delta_color=delta_color_2)
+                st.metric(f"""1. Behov for tilført el-energi fra el-nettet""", value = f"{sum_value:,} GWH/år".replace(",", " "), delta = delta_2, delta_color=delta_color_2)
             #--
             df1 = pd.read_csv(f"data/{df.columns[i]}_filtered.csv", low_memory = False)
             grunnvarme_count = len(df1[df1['grunnvarme'] == True])
