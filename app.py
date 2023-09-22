@@ -472,7 +472,7 @@ def show_metrics(df, color_sequence, sorting = "energi"):
                 st.metric(f"""1. Behov for tilført el-energi fra el-nettet""", value = f"{sum_value:,} GWH/år".replace(",", " "), delta = delta_2, delta_color=delta_color_2)
             #--
             df1 = pd.read_csv(f"data/{df.columns[i]}_filtered.csv", low_memory = False)
-            bergvarme_count = len(df1[df1['bergvarme'] == True])
+            bergvarme_count = len(df1[df1['grunnvarme'] == True])
             fjernvarme_count = len(df1[df1['fjernvarme'] == True])
             luftluft_count = len(df1[df1['luft_luft_varmepumpe'] == True])
             solceller_count = len(df1[df1['solceller'] == True])
