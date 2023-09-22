@@ -300,22 +300,23 @@ def explanation_text_scenario(scenario_name):
         st.write(""" Her er det simulert energiflyt for: """)
         st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
-        st.write(""" 3) 30% av bygg får solceller, fjernvarme, bergvarme og 30% av byggene untatt eneboliger oppgraderes. Mer fjernvarme gjelder kun i fjernvarmeområdet for bygninger som ikke er eneboliger, 
-                 og det er mindre bergvarme i områdene med tykt løsmassedekke.""")
+        st.write(" 3) 30% av bygg får solceller, fjernvarme, bergvarme og 30% av byggene untatt eneboligene oppgraderes.")
         st.write(" 4) 10% av eneboliger oppgraderes.")
+        st.write(" 5) Mer fjernvarme gjelder kun i fjernvarmeområdet for bygninger som ikke er eneboliger, og det er mindre bergvarme i områdene med tykt løsmassedekke.""")
+        
     if scenario_name == "MerLokalproduksjon":
-        st.write(""" Dette scenariet definerer en situasjon med en **større økning** når det gjelder bergvarme, fjernvarme og solceller""")
+        st.write(""" Scenariet definerer en situasjon med en **større økning** når det gjelder bergvarme, fjernvarme og solceller""")
         st.write(""" Her er det simulert energiflyt for: """)
         st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
-        st.write(""" 3) 50% av bygg får solceller, fjernvarme og bergvarme. Mer fjernvarme gjelder kun i fjernvarmeområdet for bygninger som ikke er eneboliger, 
-                 og det er mindre bergvarme i områdene med tykt løsmassedekke.""")
+        st.write(" 3) 50% av bygg får solceller, fjernvarme og bergvarme. ")
+        st.write("4) Mer fjernvarme gjelder kun i fjernvarmeområdet for bygninger som ikke er eneboliger, og det er mindre bergvarme i områdene med tykt løsmassedekke.")
     if scenario_name == "OppgradertBygningsmasse":
         st.write(""" Dette scenariet definerer en situasjon der alle bygg som har laveste byggestandard (eldre bygg) blir oppgradert til TEK10/TEK17-standard.""")
         st.write(""" Her er det simulert energiflyt for: """)
         st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
-        st.write(" 3) Alle eldre bygg oppgraderes til TEK10/TEK17-standard")
+        st.write(" 3) Alle eldre bygg oppgraderes til TEK10/TEK17-standard.")
     if scenario_name == "Bergvarme":
         st.write(""" Dette scenariet definerer en situasjon der alle bygg som ikke hadde bergvarme/fjernvarme i referansesituasjonen får bergvarme.""")
         st.write(""" Her er det simulert energiflyt for: """)
@@ -329,7 +330,7 @@ def explanation_text_scenario(scenario_name):
         st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
         st.write(" 3) Alle bygg som ligger i områder med tynt løsmassedekke og 50% av byggene i områder med tykt løsmassedekke får bergvarme. ")
-        st.write(" 4) Alle eneboligene som ligger i konsesjonsområdene for fjernvarme får også bergvarme. **Resten av i konsesjonsområdet byggene får fjernvarme.**""")
+        st.write(" 4) Alle eneboligene som ligger i konsesjonsområdene for fjernvarme får også bergvarme. **Resten av byggene i konsesjonsområdet byggene får fjernvarme.**""")
         st.write(" 5) Alle bygg får solceller.""")
 
 
