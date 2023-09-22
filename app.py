@@ -402,6 +402,14 @@ def main():
 
     st.title("Scenariobygger")
     st.warning("Under arbeid")
+    st.write("- Statistikk for de ulike scenariene")
+    st.write("- Antall bygninger som har fått ulike tiltak")
+    c1, c2 = st.columns(2)
+    with c1:
+        st.metric("Antall bygninger med grunnvarme", value = 40000)
+    with c2:
+        st.metric("Antall bygninger med fjernvarme", value = 10000)
+    """
     energy_dicts_of_dicts, scenario_names = read_scenario_file_excel(file = "scenarier.xlsx")
 
 
@@ -441,6 +449,7 @@ def main():
             st.write(scenario_name)
             st.write(energy_area)
             plot_energy_dict(energy_dict)
+    """
 
 
 
