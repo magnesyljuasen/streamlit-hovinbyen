@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+* {font-family: 'Montserrat';}
+
+/*
+body {
+    background: transparent url(https://images.template.net/wp-content/uploads/2015/04/229713-Old-paper-texture.jpg) 0% 0% no-repeat;
+    background-size: cover;
+  }
+*/
+  
+  p {
+    font-size: x-large;
+    position: relative;
+    color: transparent;
+    font-weight: 800;
+    display: block;
+    box-sizing: border-box;
+    margin: 10%;
+  }
+  
+  p:after {
+    font-size: x-large;
+    content: attr(data-content);
+      color: #1d3c34;
+    position: absolute;
+    left: 0;
+    top: 0;
+    text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
+  } 

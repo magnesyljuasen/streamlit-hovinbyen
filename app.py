@@ -369,6 +369,36 @@ def show_building_statistics():
     # Assuming you are using Streamlit to display the chart
     st.plotly_chart(pie_fig, use_container_width=True, config={'displayModeBar': False})
 
+def typewrite(text:str):
+    with open("assets/codepen.css") as f:
+        # The CSS from the codepen was stored in codepen.css
+        css = f.read()
+
+    with open("assets/codepen.js") as f:
+        # The JS from the codepen was stored in codepen.js
+        js = f.read()
+
+    html = f"""
+    <!DOCTYPE html>
+    <head>
+    <style>
+        {css}
+    </style>
+    </head>
+    <body>
+        <p id="typewrite" data-content="">{text.upper()}</p>
+        <script>
+            {js}
+        </script>
+    </body>
+    </html>
+    """
+    return html
+
+def front_page():
+    text = """Hvor mye, når og hvordan kan energieffektivisering og lokal energiproduksjon dempe presset på nettet for å bidra til raskere elektrifisering i området?"""
+    typewrited = typewrite(text)
+    st.components.v1.html(typewrited, height=500, scrolling=False)
 
 def show_metrics(df, color_sequence, sorting = "energi"):
     if sorting == "energi":
@@ -471,7 +501,9 @@ def main():
     with open("app.css") as f:
         st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 
-    tab1_site, tab2_site, tab3_site = st.tabs(["Energiscenarier", "Bygningsstatistikk", "Varighetskurver og glidende gjennomsnitt"])
+    tab0_site, tab1_site, tab2_site, tab3_site = st.tabs(["Oppdraget", "Energiscenarier", "Bygningsstatistikk", "Varighetskurver og glidende gjennomsnitt"])
+    with tab0_site:
+        front_page()
     with tab3_site:
         st.info("Resultatene som vises her gjelder for alle bygg i området.", icon="ℹ️")
         st.write("**Varighetskurver for hele området**")
