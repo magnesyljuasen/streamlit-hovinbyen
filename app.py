@@ -7,6 +7,7 @@ import numpy as np
 import datetime
 import plotly.express as px
 from streamlit_extras.chart_container import chart_container
+from PIL import Image
 
 def read_scenario_file_excel(file = "scenarier.xlsx"):
     buildingtype_to_buildingcode = {
@@ -398,7 +399,17 @@ def typewrite(text:str):
 def front_page():
     text = """Hvor mye, når og hvordan kan energieffektivisering og lokal energiproduksjon dempe presset på nettet for å bidra til raskere elektrifisering i området?"""
     typewrited = typewrite(text)
-    st.components.v1.html(typewrited, height=500, scrolling=False)
+    st.markdown("<h2 style='text-align: center;'>Systemsmart Nedre Glomma 2.0</h1>", unsafe_allow_html=True)
+    with st.container():
+        st.components.v1.html(typewrited, height=500, scrolling=False)
+    c1, c2 = st.columns(2)
+    with c1:
+        image = Image.open('assets/AsplanViak_Logo_Sekund├ªrlogo_Skogsgr├©nn_RGB.png')
+        st.image(image)
+    with c2:
+        image = Image.open('assets/Zero.png')
+        st.image(image)
+
 
 def show_metrics(df, color_sequence, sorting = "energi"):
     if sorting == "energi":
