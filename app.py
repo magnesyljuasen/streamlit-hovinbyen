@@ -452,9 +452,10 @@ def main():
 
     #--
     st.title("Glidende gjennomsnitt")
-    selected_window_size = st.slider("Periode (uker)", min_value = 1, value = 2, max_value=3, step = 1) * 168
+    st.info("Skru av og på kurvene i tegnforklaringen for å isolere ulike scenarier.", icon="ℹ️")
+    #selected_window_size = st.slider("Periode (uker)", min_value = 1, value = 2, max_value=3, step = 1) * 168
     with chart_container(df, tabs = ["Årlig energibehov", "Se data", "Eksporter data"], export_formats=["CSV"]):
-        fig1 = plot_dataframe_moving_average(df = df, color_sequence = color_sequence, window_size = selected_window_size)
+        fig1 = plot_dataframe_moving_average(df = df, color_sequence = color_sequence, window_size = 168)
         st.plotly_chart(fig1, use_container_width = True, config = {'displayModeBar': False})
     
     #--
@@ -463,6 +464,12 @@ def main():
              Garasjer, industri og andre bygningskategorier uten energibehov er filtrert bort.""")
     
     st.warning("Graf - bygningsstatistikk")
+    df2 = pd.read_csv("data/Referansesituasjon_filtered.csv")
+    #st.write(df2.head())
+    #fig = px.bar(df2, x='BYGNINGSTYPE_NAVN', title='Building Types Count',
+     #        labels={'BYGNINGSTYPE_NAVN': 'Building Type'},
+    #         category_orders={"BYGNINGSTYPE_NAVN": sorted(df['BYGNINGSTYPE_NAVN'].unique())})
+    #st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
     
     st.write("""Det er simulert 10 ulike scenarier som vises nedenfor. 
              Disse er preprossesert, **men fullt mulig å konfigurere og definere som man vil**. 
