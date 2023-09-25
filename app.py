@@ -67,11 +67,20 @@ def sort_columns_high_to_low(df):
 def rounding_to_int(number):
     return int(round(number, 0))
 
-def plot_dataframe(df, color_sequence, sorting = True):
-    df.sort_index(axis=1, inplace=True)
+def plot_dataframe(df1, color_sequence, sorting = True):
+    column_mapping = {
+        "LuftLuftVarmepumper" : "Luft-luft-varmepumper",
+        "Fremtidssituasjon2030" : "Mulig fremtidssituasjon 2030",
+        "MerLokalproduksjon" : "Mer lokalproduksjon",
+        "OppgradertBygningsmasse" : "Oppgradert bygningsmasse",
+        "BergvarmeSolFjernvarme" : "Bergvarme og sol"
+    }
+    df1 = df1.copy()
+    df1.rename(columns=column_mapping, inplace=True)
+    df1.sort_index(axis=1, inplace=True)
     if sorting == True:
-        df = sort_columns_high_to_low(df)
-        fig = px.line(df, x=df.index, y=df.columns, color_discrete_sequence=color_sequence)
+        df1 = sort_columns_high_to_low(df1)
+        fig = px.line(df1, x=df1.index, y=df1.columns, color_discrete_sequence=color_sequence)
         fig.update_layout(
             legend=dict(bgcolor="rgba(0,0,0,0)"),
             )
@@ -91,7 +100,7 @@ def plot_dataframe(df, color_sequence, sorting = True):
             gridcolor="lightgrey",
             )
     else:
-        fig = px.area(df, x=df.index, y=df.columns)
+        fig = px.area(df1, x=df1.index, y=df1.columns)
        
         fig.update_traces(
             line=dict(
@@ -141,9 +150,18 @@ def plot_dataframe(df, color_sequence, sorting = True):
 
     return fig
 
-def plot_dataframe_moving_average(df, color_sequence = "red", window_size = 168):
+def plot_dataframe_moving_average(df1, color_sequence = "red", window_size = 168):
+    column_mapping = {
+        "LuftLuftVarmepumper" : "Luft-luft-varmepumper",
+        "Fremtidssituasjon2030" : "Mulig fremtidssituasjon 2030",
+        "MerLokalproduksjon" : "Mer lokalproduksjon",
+        "OppgradertBygningsmasse" : "Oppgradert bygningsmasse",
+        "BergvarmeSolFjernvarme" : "Bergvarme og sol"
+    }
+    df1 = df1.copy()
+    df1.rename(columns=column_mapping, inplace=True)
     window_size = window_size
-    moving_avg = df.rolling(window=window_size).mean()
+    moving_avg = df1.rolling(window=window_size).mean()
     if color_sequence == "red":
         fig = px.line(moving_avg, x=moving_avg.index, y=moving_avg.columns)
         fig.update_traces(
@@ -601,8 +619,8 @@ def show_metrics(df, color_sequence, sorting = "energi"):
             df_option = df[df.columns[i]].to_frame()
             with st.expander("Plot og data", expanded = False):
                 with chart_container(df_option, tabs = ["Årlig energibehov", "Se data", "Eksporter data"], export_formats=["CSV"]):
-                    fig1 = plot_dataframe(df = df_option, color_sequence = color_sequence[i], sorting = False)
-                    fig2 = plot_dataframe_moving_average(df = df_option, window_size = 100)
+                    fig1 = plot_dataframe(df1 = df_option, color_sequence = color_sequence[i], sorting = False)
+                    fig2 = plot_dataframe_moving_average(df1 = df_option, window_size = 100)
                     fig3 = merge_plots(fig1, fig2)
                     st.plotly_chart(fig3, use_container_width = True, config = {'displayModeBar': False})
                     #st.plotly_chart(fig1, use_container_width = True, config = {'displayModeBar': False})
@@ -642,7 +660,7 @@ def main():
     ]
 
         #with chart_container(df, tabs = ["Varighetskurver", "Se data", "Eksporter data"], export_formats=["CSV"]):
-        fig = plot_dataframe(df = df, color_sequence = color_sequence, sorting = True)
+        fig = plot_dataframe(df1 = df, color_sequence = color_sequence, sorting = True)
         st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
         with st.expander("Se data"):
             st.write(df)
@@ -651,7 +669,7 @@ def main():
         st.write("**Glidende gjennomsnitt**")
         #selected_window_size = st.slider("Periode (uker)", min_value = 1, value = 2, max_value=3, step = 1) * 168
         #with chart_container(df, tabs = ["Årlig energibehov", "Se data", "Eksporter data"], export_formats=["CSV"]):
-        fig1 = plot_dataframe_moving_average(df = df, color_sequence = color_sequence, window_size = 168)
+        fig1 = plot_dataframe_moving_average(df1 = df, color_sequence = color_sequence, window_size = 168)
         st.plotly_chart(fig1, use_container_width = True, config = {'displayModeBar': False})
         with st.expander("Se data"):
             st.write(df)
