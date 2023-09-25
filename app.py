@@ -400,7 +400,6 @@ def __plot_building_statistics(df2, show_largest = True):
     total = grouped_df['COUNT'].sum()
     grouped_df['Percentage'] = (grouped_df['COUNT'] / total) * 100
     #--
-    st.write(grouped_df)
     fig = px.bar(grouped_df, x='BYGNINGSTYPE_NAVN', y='COUNT', text='Percentage')
     fig.update_traces(texttemplate='%{text:.0f}%', textposition='inside', textfont_color='white')
 
