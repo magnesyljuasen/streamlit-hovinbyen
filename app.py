@@ -390,10 +390,20 @@ def plot_energy_dict(energy_dict):
     df_splitted.index = key_mapping
     st.bar_chart(df_splitted)
 
-def __plot_building_statistics(df2):
+def __plot_building_statistics(df2, show_largest = True):
     st.write(f"**Antall bygg: {len(df2):,}**".replace(",", " "))
     grouped_df = df2.groupby('BYGNINGSTYPE_NAVN').size().reset_index(name='COUNT')
-    fig = px.bar(grouped_df, x='BYGNINGSTYPE_NAVN', y='COUNT')
+    grouped_df = grouped_df.sort_values(by='COUNT', ascending=False)
+    if show_largest == True:
+        grouped_df = grouped_df.head(10)
+    #-- percentages
+    total = grouped_df['COUNT'].sum()
+    grouped_df['Percentage'] = (grouped_df['COUNT'] / total) * 100
+    #--
+    st.write(grouped_df)
+    fig = px.bar(grouped_df, x='BYGNINGSTYPE_NAVN', y='COUNT', text='Percentage')
+    fig.update_traces(texttemplate='%{text:.0f}%', textposition='inside', textfont_color='white')
+
     fig.update_layout(
     autosize=True,
     margin=dict(l=0,r=0,b=10,t=10,pad=0),
@@ -433,6 +443,7 @@ def __plot_building_statistics(df2):
     st.plotly_chart(pie_fig, use_container_width=True, config={'displayModeBar': False})
 
 def show_building_statistics():
+    show_largest = st.toggle("Vis kun de 10 største bygningstypene", value = True)
     tab1, tab2, tab3, tab4 = st.tabs(["Hele området", "Fjernvarmeområder", "Tynt løsmassedekke", "Tykt løsmassedekke"])
     df = pd.read_csv("data/Referansesituasjon_filtered.csv")
     df1 = df.copy()
@@ -440,16 +451,16 @@ def show_building_statistics():
     df3 = df.copy()
     df4 = df.copy()
     with tab1:
-        __plot_building_statistics(df1)
+        __plot_building_statistics(df1, show_largest = show_largest)
     with tab2:
         df2 = df2.loc[df2["Energiomraadeid"] == "A"]
-        __plot_building_statistics(df2)
+        __plot_building_statistics(df2, show_largest = show_largest)
     with tab3:
         df3 = df3.loc[df3["Energiomraadeid"] == "B"]
-        __plot_building_statistics(df3)
+        __plot_building_statistics(df3, show_largest = show_largest)
     with tab4:
         df4 = df4.loc[df4["Energiomraadeid"] == "C"]
-        __plot_building_statistics(df4)
+        __plot_building_statistics(df4, show_largest = show_largest)
         
     
 
