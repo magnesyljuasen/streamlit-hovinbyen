@@ -390,8 +390,8 @@ def plot_energy_dict(energy_dict):
     df_splitted.index = key_mapping
     st.bar_chart(df_splitted)
 
-def show_building_statistics():
-    df2 = pd.read_csv("data/Referansesituasjon_filtered.csv")
+def __plot_building_statistics(df2):
+    st.write(f"**Antall bygg: {len(df2):,}**".replace(",", " "))
     grouped_df = df2.groupby('BYGNINGSTYPE_NAVN').size().reset_index(name='COUNT')
     fig = px.bar(grouped_df, x='BYGNINGSTYPE_NAVN', y='COUNT')
     fig.update_layout(
@@ -431,6 +431,27 @@ def show_building_statistics():
 
     # Assuming you are using Streamlit to display the chart
     st.plotly_chart(pie_fig, use_container_width=True, config={'displayModeBar': False})
+
+def show_building_statistics():
+    tab1, tab2, tab3, tab4 = st.tabs(["Hele området", "Fjernvarmeområder", "Tynt løsmassedekke", "Tykt løsmassedekke"])
+    df = pd.read_csv("data/Referansesituasjon_filtered.csv")
+    df1 = df.copy()
+    df2 = df.copy()
+    df3 = df.copy()
+    df4 = df.copy()
+    with tab1:
+        __plot_building_statistics(df1)
+    with tab2:
+        df2 = df2.loc[df2["Energiomraadeid"] == "A"]
+        __plot_building_statistics(df2)
+    with tab3:
+        df3 = df3.loc[df3["Energiomraadeid"] == "B"]
+        __plot_building_statistics(df3)
+    with tab4:
+        df4 = df4.loc[df4["Energiomraadeid"] == "C"]
+        __plot_building_statistics(df4)
+        
+    
 
 def typewrite(text:str):
     with open("assets/codepen.css") as f:
