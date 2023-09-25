@@ -455,54 +455,55 @@ def front_page():
 
 def show_temperature_series():
     df = pd.read_excel("assets/ns3031.xlsx")
-    fig = px.line(df, x=df.index, y=df.columns)
-       
-    fig.update_traces(
-        line=dict(
-            width=0.5, 
-            #color = color_sequence
-            color = "blue"
-        ))
-    fig.update_layout(
-        legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)"),
-        xaxis = dict(
-            tickmode = 'array',
-            tickvals = [0, 24 * (31), 24 * (31 + 28), 24 * (31 + 28 + 31), 24 * (31 + 28 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31)],
-            ticktext = ["1.jan", "", "1.mar", "", "1.mai", "", "1.jul", "", "1.sep", "", "1.nov", "", "1.jan"]
-            )
-    )
-    fig.update_xaxes(
-    range=[0, 8760],
-    title_text='',
-    mirror=True,
-    ticks="outside",
-    showline=True,
-    linecolor="black",
-    gridcolor="lightgrey",
-    )
-    #-#--
-    #--
-    fig["data"][0]["showlegend"] = True
-    fig.update_layout(
-        #height = 1000,
-        margin=dict(l=50,r=50,b=10,t=10,pad=0),
-        legend={'title_text':''},
-        barmode="stack", 
-        plot_bgcolor="white", paper_bgcolor="white",
-        legend_traceorder="reversed",
+    with chart_container(df, tabs = ["Graf", "Se data", "Eksporter data"], export_formats=["CSV"]):
+        fig = px.line(df, x=df.index, y=df.columns)
+        
+        fig.update_traces(
+            line=dict(
+                width=0.5, 
+                #color = color_sequence
+                color = "blue"
+            ))
+        fig.update_layout(
+            legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)"),
+            xaxis = dict(
+                tickmode = 'array',
+                tickvals = [0, 24 * (31), 24 * (31 + 28), 24 * (31 + 28 + 31), 24 * (31 + 28 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31)],
+                ticktext = ["1.jan", "", "1.mar", "", "1.mai", "", "1.jul", "", "1.sep", "", "1.nov", "", "1.jan"]
+                )
         )
-    
- 
-    fig.update_yaxes(
-        #range=[-400, 600],
-        title_text='Utetemperatur [°C]',
+        fig.update_xaxes(
+        range=[0, 8760],
+        title_text='',
         mirror=True,
         ticks="outside",
         showline=True,
         linecolor="black",
         gridcolor="lightgrey",
-    )
-    st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
+        )
+        #-#--
+        #--
+        fig["data"][0]["showlegend"] = True
+        fig.update_layout(
+            #height = 1000,
+            margin=dict(l=50,r=50,b=10,t=10,pad=0),
+            legend={'title_text':''},
+            barmode="stack", 
+            plot_bgcolor="white", paper_bgcolor="white",
+            legend_traceorder="reversed",
+            )
+        
+    
+        fig.update_yaxes(
+            #range=[-400, 600],
+            title_text='Utetemperatur [°C]',
+            mirror=True,
+            ticks="outside",
+            showline=True,
+            linecolor="black",
+            gridcolor="lightgrey",
+        )
+        st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
 
 
 def show_metrics(df, color_sequence, sorting = "energi"):
