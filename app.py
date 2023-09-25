@@ -269,36 +269,36 @@ def explanation_text_scenario(scenario_name):
     if scenario_name == "Referansesituasjon":
         st.write(""" Referansesituasjonen definerer nullsituasjonen for området og er den de andre scenariene sammenlignes med. """)
         st.write(""" Her er det simulert energiflyt for: """)
-        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (untatt industri).")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
     if scenario_name == "LuftLuftVarmepumper":
         st.write(""" Dette scenariet definerer en situasjon der alle bygg som ikke hadde bergvarme/fjernvarme i referansesituasjonen får luft luft varmepumper.""")
         st.write(""" Her er det simulert energiflyt for: """)
-        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (untatt industri).")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
         st.write(" 3) Resten av byggene har luft luft varmepumpe")
     if scenario_name == "Nåsituasjon":
         st.write(""" Nåsituasjonen er et forsøk på å definere området slik det er i dag.""")
         st.write(""" Her er det simulert energiflyt for: """)
-        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (untatt industri).")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
         st.write(" 3) 60% av byggene har luft luft varmepumpe og 10% av byggene har solceller.")
     if scenario_name == "Solceller":
         st.write(""" Dette scenariet definerer en situasjon der alle bygg som ikke hadde bergvarme/fjernvarme i referansesituasjonen får solceller.""")
         st.write(""" Her er det simulert energiflyt for: """)
-        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (untatt industri).")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
         st.write(" 3) Resten av byggene har solceller.")
     if scenario_name == "Fjernvarme":
         st.write(""" Dette scenariet definerer en situasjon der alle bygg som **ligger innenfor konsensjonsområdene for fjernvarme og som ikke er eneboliger** får fjernvarme.""")
         st.write(""" Her er det simulert energiflyt for: """)
-        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (untatt industri).")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
         st.write(" 3) Alle byggene i fjernvarmeområdene som ikke er eneboliger får fjernvarme.")
     if scenario_name == "Fremtidssituasjon2030":
         st.write(""" Scenariet definerer en antatt situasjon for år 2030 med en **moderat økning** når det gjelder bergvarme, fjernvarme, solceller og oppgradering av bygningsmassen.""")
         st.write(""" Her er det simulert energiflyt for: """)
-        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (untatt industri).")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
         st.write(" 3) 30% av bygg får solceller, fjernvarme, bergvarme og 30% av byggene untatt eneboligene oppgraderes.")
         st.write(" 4) 10% av eneboliger oppgraderes.")
@@ -307,30 +307,30 @@ def explanation_text_scenario(scenario_name):
     if scenario_name == "MerLokalproduksjon":
         st.write(""" Scenariet definerer en situasjon med en **større økning** når det gjelder bergvarme, fjernvarme og solceller""")
         st.write(""" Her er det simulert energiflyt for: """)
-        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (untatt industri).")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
         st.write(" 3) 50% av bygg får solceller, fjernvarme og bergvarme. ")
         st.write("4) Mer fjernvarme gjelder kun i fjernvarmeområdet for bygninger som ikke er eneboliger, og det er mindre bergvarme i områdene med tykt løsmassedekke.")
     if scenario_name == "OppgradertBygningsmasse":
         st.write(""" Dette scenariet definerer en situasjon der alle bygg som har laveste byggestandard (eldre bygg) blir oppgradert til TEK10/TEK17-standard.""")
         st.write(""" Her er det simulert energiflyt for: """)
-        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (untatt industri).")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
         st.write(" 3) Alle eldre bygg oppgraderes til TEK10/TEK17-standard.")
     if scenario_name == "Bergvarme":
         st.write(""" Dette scenariet definerer en situasjon der alle bygg som ikke hadde bergvarme/fjernvarme i referansesituasjonen får bergvarme.""")
         st.write(""" Her er det simulert energiflyt for: """)
-        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (untatt industri).")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
         st.write(" 3) Alle bygg som ligger i områder med tynt løsmassedekke og 50% av byggene i områder med tykt løsmassedekke får bergvarme. ")
         st.write(" 4) Alle eneboligene som ligger i konsesjonsområdene for fjernvarme for også bergvarme.")
     if scenario_name == "BergvarmeSolFjernvarme":
-        st.write(""" Dette scenariet definerer en situasjon med en **veldig stor økning** når det gjelder bergvarme, fjernvarme og solceller""")
+        st.write(""" Dette scenariet definerer en situasjon med en **veldig stor økning** når det gjelder bergvarme og solceller""")
         st.write(""" Her er det simulert energiflyt for: """)
-        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag.")
+        st.write(" 1) Alle bygg som er koblet på fjernvarme i dag (untatt industri).")
         st.write(" 2) Alle bygg er som har energibrønn på tomten (sjekket mot nasjonal grunnvannsdatabase GRANADA).")
         st.write(" 3) Alle bygg som ligger i områder med tynt løsmassedekke og 50% av byggene i områder med tykt løsmassedekke får bergvarme. ")
-        st.write(" 4) Alle eneboligene som ligger i konsesjonsområdene for fjernvarme får også bergvarme. **Resten av byggene i konsesjonsområdet byggene får fjernvarme.**""")
+        st.write(" 4) Alle eneboligene som ligger i konsesjonsområdene for fjernvarme får også bergvarme. """)
         st.write(" 5) Alle bygg får solceller.""")
 
 
@@ -453,6 +453,57 @@ def front_page():
         image = Image.open('assets/Zero.png')
         st.image(image)
 
+def show_temperature_series():
+    df = pd.read_excel("assets/ns3031.xlsx")
+    fig = px.line(df, x=df.index, y=df.columns)
+       
+    fig.update_traces(
+        line=dict(
+            width=0.5, 
+            #color = color_sequence
+            color = "blue"
+        ))
+    fig.update_layout(
+        legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)"),
+        xaxis = dict(
+            tickmode = 'array',
+            tickvals = [0, 24 * (31), 24 * (31 + 28), 24 * (31 + 28 + 31), 24 * (31 + 28 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30), 24 * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31)],
+            ticktext = ["1.jan", "", "1.mar", "", "1.mai", "", "1.jul", "", "1.sep", "", "1.nov", "", "1.jan"]
+            )
+    )
+    fig.update_xaxes(
+    range=[0, 8760],
+    title_text='',
+    mirror=True,
+    ticks="outside",
+    showline=True,
+    linecolor="black",
+    gridcolor="lightgrey",
+    )
+    #-#--
+    #--
+    fig["data"][0]["showlegend"] = True
+    fig.update_layout(
+        #height = 1000,
+        margin=dict(l=50,r=50,b=10,t=10,pad=0),
+        legend={'title_text':''},
+        barmode="stack", 
+        plot_bgcolor="white", paper_bgcolor="white",
+        legend_traceorder="reversed",
+        )
+    
+ 
+    fig.update_yaxes(
+        #range=[-400, 600],
+        title_text='Utetemperatur [°C]',
+        mirror=True,
+        ticks="outside",
+        showline=True,
+        linecolor="black",
+        gridcolor="lightgrey",
+    )
+    st.plotly_chart(fig, use_container_width = True, config = {'displayModeBar': False})
+
 
 def show_metrics(df, color_sequence, sorting = "energi"):
     if sorting == "energi":
@@ -482,7 +533,7 @@ def show_metrics(df, color_sequence, sorting = "energi"):
             elif name == "OppgradertBygningsmasse":
                 name = "Oppgradert bygningsmasse"
             elif name == "BergvarmeSolFjernvarme":
-                name = "Bergvarme, sol og fjernvarme"
+                name = "Bergvarme og sol"
             st.subheader(name)
             explanation_text_scenario(df.columns[i])
             column_1, column_2 = st.columns(2)
@@ -626,11 +677,19 @@ def main():
         st.write(" - • At 30% av alle eneboliger skal ha solceller, 50% av de som er innenfor området med tynt løsmassedekke skal ha bergvarme og 20% av eneboligene får oppgradert byggestandard.")
         
         st.write("Det er altså mulig å velge enkelttiltak samt kombinasjoner for ulike bygg i ulike energiområder.")
+        with st.expander("Forutsetninger for beregningene"):
+            st.write("**Utetemperatur**")
+            st.write("Utetemperatur som ligger til grunn er hentet fra NS3031, og vist i figuren under. ")
+            show_temperature_series()
+            st.write("**Industribygg**")
+            st.write("""Industribygg er ikke tatt med i beregningene. Det er 281 + 119 = 400 adresser som er påkoblet fjernvarme. 
+                     138 av disse er "industribygg", og fjernes fra simuleringen, derav 262 som blir simulert.""")
         st.info("Vi ønsker innspill på hvilke scenarier som er lure å simulere.", icon="ℹ️")
         #expansion_state = st.toggle("Vis plot", value = False)
         #expansion_state = True
         #if expansion_state:
             #st.experimental_rerun()
+        
         tab1, tab2 = st.tabs(["**Effekt**sortering (høyeste til laveste)", "**Energi**sortering (høyeste til laveste)"])
         with tab1:
             show_metrics(df, color_sequence, sorting = "effekt")
