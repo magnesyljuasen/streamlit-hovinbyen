@@ -668,7 +668,7 @@ def main():
     with open("app.css") as f:
         st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 
-    st.markdown("<h1 style='text-align: center;'>Hovinbyen</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:'>Hovinbyen</h1>", unsafe_allow_html=True)
     tab1_site, tab2_site, tab3_site = st.tabs(["Energiscenarier", "Bygningsstatistikk", "Varighetskurver og glidende gjennomsnitt"])
     #with tab0_site:
     #    front_page()
