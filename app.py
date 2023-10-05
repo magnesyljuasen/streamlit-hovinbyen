@@ -139,7 +139,7 @@ def plot_dataframe(df1, color_sequence, sorting = True):
     
  
     fig.update_yaxes(
-        range=[-400, 600],
+        range=[0, 300],
         title_text='Effekt [MW]',
         mirror=True,
         ticks="outside",
@@ -209,7 +209,7 @@ def plot_dataframe_moving_average(df1, color_sequence = "red", window_size = 168
 
 
     fig.update_yaxes(
-        range=[-100, 450],
+        range=[0, 300],
         title_text='Effekt [MW]',
         mirror=True,
         ticks="outside",
@@ -417,7 +417,7 @@ def __plot_building_statistics(df2, show_largest = True):
         gridcolor="lightgrey",
     )
     fig.update_yaxes(
-        range=[0, 30000],
+        range=[0, 4000],
         tickformat=",",
         ticks="outside",
         linecolor="black",
@@ -443,6 +443,7 @@ def __plot_building_statistics(df2, show_largest = True):
 
 def show_building_statistics():
     show_largest = st.toggle("Vis kun de 10 største bygningstypene", value = True)
+    st.warning("Ikke delt inn i områder enda")
     tab1, tab2, tab3, tab4 = st.tabs(["Hele området", "Fjernvarmeområder", "Tynt løsmassedekke", "Tykt løsmassedekke"])
     df = pd.read_csv("data/Referansesituasjon_filtered.csv")
     df1 = df.copy()
@@ -490,7 +491,7 @@ def typewrite(text:str):
     return html
 
 def front_page():
-    text = """Hvor mye, når og hvordan kan energieffektivisering og lokal energiproduksjon dempe presset på nettet for å bidra til raskere elektrifisering i området?"""
+    text = """Energiplanlegging"""
     typewrited = typewrite(text)
     with st.container():
         st.components.v1.html(typewrited, height=500, scrolling=False)
@@ -585,7 +586,7 @@ def show_metrics(df, color_sequence, sorting = "energi"):
             elif name == "BergvarmeSolFjernvarme":
                 name = "Bergvarme og sol"
             st.subheader(name)
-            explanation_text_scenario(df.columns[i])
+            #explanation_text_scenario(df.columns[i])
             column_1, column_2 = st.columns(2)
             delta_color_1 = "inverse"
             delta_1 = f"{-max_value_reduction} %"
@@ -637,7 +638,7 @@ def show_metrics(df, color_sequence, sorting = "energi"):
                     gridcolor="lightgrey",
                 )
                 fig.update_yaxes(
-                    range=[0, 52834],
+                    range=[0, 4000],
                     tickformat=",",
                     ticks="outside",
                     linecolor="black",
@@ -667,10 +668,10 @@ def main():
     with open("app.css") as f:
         st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 
-    st.markdown("<h1 style='text-align: center;'>Systemsmart <br>Nedre Glomma 2.0</h1>", unsafe_allow_html=True)
-    tab0_site, tab1_site, tab2_site, tab3_site = st.tabs(["Oppdraget", "Energiscenarier", "Bygningsstatistikk", "Varighetskurver og glidende gjennomsnitt"])
-    with tab0_site:
-        front_page()
+    st.markdown("<h1 style='text-align: center;'>Hovinbyen</h1>", unsafe_allow_html=True)
+    tab1_site, tab2_site, tab3_site = st.tabs(["Energiscenarier", "Bygningsstatistikk", "Varighetskurver og glidende gjennomsnitt"])
+    #with tab0_site:
+    #    front_page()
     with tab3_site:
         st.info("Resultatene som vises her gjelder for alle bygg i området.", icon="ℹ️")
         st.write("**Varighetskurver for hele området**")
@@ -709,8 +710,6 @@ def main():
         #--
     with tab2_site:
         st.header("Bygningsstatistikk")
-        st.write("""Det er totalt **52 834 bygg** i området som er tilgjengelige for energitiltak. 
-                Garasjer, industri og andre bygningskategorier uten energibehov er filtrert bort.""")
         
         with st.expander("Vis bygningsstatistikk", expanded = True):
             show_building_statistics()
@@ -731,10 +730,6 @@ def main():
             st.write("**Utetemperatur**")
             st.write("Utetemperatur som ligger til grunn er hentet fra NS3031, og vist i figuren under. ")
             show_temperature_series()
-            st.write("**Industribygg**")
-            st.write("""Industribygg er ikke tatt med i beregningene. Det er 281 + 119 = 400 adresser som er påkoblet fjernvarme. 
-                     138 av disse er "industribygg", og fjernes fra simuleringen, derav 262 som blir simulert.""")
-        st.info("Vi ønsker innspill på hvilke scenarier som er lure å simulere.", icon="ℹ️")
         #expansion_state = st.toggle("Vis plot", value = False)
         #expansion_state = True
         #if expansion_state:
